@@ -1,0 +1,49 @@
+  <main role="main" class="container flex-fill" id="register">
+    <div class="container-fluid">
+    {% if method == 'POST' and action == 'register-submit' %}
+      {% if error == 'true' %}
+      <div class="row">
+        <div class="col-12">
+          <h2>There was an issue processing your request...</h2>
+          <hr>
+          <p class="mb-2">{{ error_message|raw }}</p>
+          <a href="{{ referer }}" class="btn btn-lg btn-primary">Go back</a>
+        </div>
+      </div>
+      {% endif %}
+
+    {% else %}  
+      {% if action == 'register-form' %}
+      <div class="row register-block">
+        <div class="col-12">
+          <div class="logo"><img src="{{ site_url }}/assets/images/logo.png"></div>
+          <p style="margin: 0 auto 40px auto; max-width: 480px; display: block" class="text-center">Access to the portal is limited to our customers. If you do not have an account, please request one below.</p>
+          <hr style="margin-bottom: 40px">
+          <form action="/register" method="post">
+            <div class="form-group mb-3">
+              <input type="email" class="form-control" id="emailAddress" aria-describedby="emailHelp" placeholder="Email*" name="emailAddress" required />
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" id="accountPassword" placeholder="Password*" name="accountPassword" required />
+            </div>
+            <input type="submit" class="btn btn-primary w-100" value="Register">
+            <hr>
+            <a href="/reset-password" class="btn btn-secondary btn-block">Reset Passsword</a>
+          </form>
+        </div>
+      </div>
+      {% elseif action == 'activation_sent' %}
+      <div class="row">
+        <div class="col-12">
+          <h2>Account Activation</h2>
+          <hr>
+          <p>An activation email has been sent to your email address. Please check your email to finish registering your account.</p>
+        </div>
+      </div>
+      {% endif %}
+
+    {% endif %}
+
+    </div>
+  </main>
+

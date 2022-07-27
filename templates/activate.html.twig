@@ -1,0 +1,24 @@
+  <main role="main" class="container flex-fill" id="activate">
+    <div class="container-fluid">
+
+      <div class="row">
+        <div class="col-12">
+
+        {% if activated == 'true' %}
+          <h2>You are now registered!</h2>
+          <hr>
+          <p class="short-text">Your account has been successfully activated. You can now access your private downloads and ticket history after you login.</p>
+          <a href="{{ site_url }}/login" class="btn btn-lg btn-primary">Go Login</a>
+        {% else %}
+          <h2>We apologize for the troubles...</h2>
+          <hr>
+          <p>{{ error_message }}</p>
+          <a href="{{ site_url }}" class="btn btn-lg btn-primary">Go Home</a>
+        {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+

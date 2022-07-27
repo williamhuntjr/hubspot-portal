@@ -1,0 +1,182 @@
+<main role="main" class="container-fluid flex-fill" id="ticket-container">
+
+    {% if view_by == 'open' %}
+      {% set tickets = tickets_open %}
+    {% endif %}
+
+    {% if view_by == 'closed' %}
+      {% set tickets = tickets_closed %}
+    {% endif %}
+
+    {% if view_by == 'all' %}
+      {% set tickets = tickets_all %}
+    {% endif %}
+
+  <div class="row">
+
+    <div class="col-sm-12 col-md-7 col-lg-8 col-xl-9 ticket-conversation">
+      {% if action == "view" and cannot_view == "false" %}
+      {% set timestamp = ((ticket_data.properties.createdate.value / 1000) - 14400)|round(0, 'floor') %}
+
+
+      <div class="content container-fluid">
+
+        <div class="row">
+          <div class="col-sm-12 col-xs-12 chat" style="overflow: hidden; outline: none;" tabindex="5001">
+            <div class="col-inside-lg decor-default text-center ticket-id">
+              <div><p class="d-flex justify-content-between align-items-center mb-0"><small class="status {{ ticket_data.hs_status }}">{{ ticket_data.hs_status }}</small> <span>Ticket number: <strong>#{{ ticket_data.properties.hs_ticket_id.value }}</strong></span> &nbsp</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12 col-xs-12 chat" style="overflow: hidden; outline: none;" tabindex="5001">      
+            <div class="col-inside-lg decor-default ticket-details">
+              <div class="subject"><h4 class="mb-0">{{ ticket_data.properties.subject.value }}</h4></div>
+              <div class="description"><p class="mb-2">{{ ticket_data.properties.content.value }}</p></div>
+              <hr>
+              <div class="date"><small class="mb-0">Created on {{ timestamp|date('M d, Y h:i:s A') }}</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12 col-xs-12 chat" style="overflow: hidden; outline: none;" tabindex="5001">
+            <div class="col-inside-lg decor-default chat-content">
+              <div class="chat-body">
+              {% if ticket_emails is empty %}
+                <div><p class="mb-0">There is no email correspondence to display. Please check back later for an update or contact support directly. We apologize for this inconvenience.</p></div>
+              {% endif %}
+
+              {% for email in ticket_emails %}
+                {% set timestamp = ((email.engagement.createdAt / 1000) - 14400)|round(0, 'floor') %}
+
+                <div class="answer {% if email.engagement.type == 'INCOMING_EMAIL' %} right {% else %} left {% endif %}">
+                  <div class="avatar"><p class="mb-0">{% if email.engagement.type == 'INCOMING_EMAIL' %}{{ email.initials }}{% else %}<img src="/assets/images/logo_v1.png" alt="XT" style="width: 25px; height: 18px; margin-left: 7px; position: relative; top: 4px">{% endif %}</p></div>
+                  <div class="name"><strong>{{ email.metadata.from.firstName }} {{ email.metadata.from.lastName }}</strong></div>
+                  <div class="subject">{{ email.metadata.subject }}</div>
+
+                  {% if email.metadata.html is not empty %}
+                    {% set message = email.metadata.html %}
+                  {% elseif email.metadata.text is not empty %}
+                    {% set message = email.metadata.text %}
+                  {% else %}
+                    {% set message = "There was an error retrieving the message..." %}
+                  {% endif %}
+
+                  <div class="text">
+                    {{ message|raw }}
+                </div>
+                <div class="time">{{ timestamp|date('M d, Y h:i:s A') }}</div>
+              </div>
+
+              {% endfor %}
+              </div>
+              {% if has_email_config == false %}
+              <div class="reply">
+                <p class="text-danger text-center">Before you can send a reply you need to configure your email credentials <strong><a href="{{ site_url }}/settings">here</a></strong>.</p>
+              </div>
+              {% elseif ticket_emails is not empty %}
+              <div class="reply">
+                <form action="/send-response" method="post" id="email-form" autocomplete="false">
+                  <input type="text" style="display: none;" name="lastId" value="{{ last_email.metadata.messageId }}">
+                  <input type="text" style="display: none;" name="lastEmail" value="{{ last_email.metadata.from.email }}">
+                  <input type="text" style="display: none;" name="lastSubject" value="{{ last_email.metadata.subject }}">
+                  <input type="text" style="display: none;" name="lastReferences" value="{{ last_references }}">
+
+                  <div class="answer-add">
+                    <textarea placeholder="Enter your message" required name="reply" id="reply"></textarea>
+                  </div>
+
+                  <div class="send-message text-right mt-3">
+                    <!-- Button trigger modal -->
+                    <button type="submit" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#replyModal">
+                      Send
+                    </button>
+                  </div>
+
+                  <div class="modal fade" data-backdrop="static" data-keyboard="false" id="replyModal" tabindex="-1" role="dialog" aria-labelledby="replyModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="replyModalLongTitle">Sending reply</h5>
+                        </div>
+                        <div class="modal-body">
+                          Please wait...
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </form>
+              </div>
+              {% endif %}
+
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    </div>
+
+    <div class="col-sm-12 col-md-5 col-lg-4 col-xl-3 h-100 sidebar">
+      <div class="list-group ticket-list">
+
+        {% set ticket_count = tickets_open|length + tickets_closed|length %}
+        <a href="/tickets/all/1" class="{% if view_by == "all" %}active{% endif %} list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+          All Tickets <span class="badge badge-primary badge-pill">{{ tickets_all|length }}</span>
+        </a>
+        <a href="/tickets/open/1" class="{% if view_by == "open" %}active{% endif %} list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+          Open Tickets <span class="badge badge-primary badge-pill">{{ tickets_open|length }}</span>
+        </a>
+        <a href="/tickets/closed/1" class="{% if view_by == "closed" %}active{% endif %} list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+          Closed Tickets <span class="badge badge-primary badge-pill">{{ tickets_closed|length }}</span>
+        </a>
+
+      {% set counter = 0 %}
+      {% for ticket in tickets %}
+        {% set counter = counter + 1 %}
+
+        {% set timestamp = ((ticket.properties.createdate.value / 1000) - 14400)|round(0, 'floor') %}
+        
+        <a href="/tickets/view/{{ ticket.properties.hs_ticket_id.value }}" ticket-num="{{ counter }}" ticket-id="{{ ticket.properties.hs_ticket_id.value }}" class="list-group-item list-group-item-action flex-column align-items-start">
+          <div class="d-flex justify-content-between align-items-center">
+            <small class="status {{ ticket.status }}">{{ ticket.status }}</small>
+            <small class="status all">#{{ ticket.properties.hs_ticket_id.value }}</small>
+          </div>
+          <div class="d-flex w-100 justify-content-between mt-2">
+            <div class="col-8 pl-0 pr-0 ml-0 mr-0">
+              <h5 class="mb-0">{{ ticket.properties.subject.value }}</h5>
+            </div>
+            <div class="col-4 pl-0 pr-0 ml-0 mr-0 date">
+              <small>{{ timestamp|date('M d, Y') }}</small>
+            </div>
+          </div>
+          <p class="mb-1 description">{{ ticket.properties.content.value }}</p>
+        </a>
+
+      {% endfor %}
+
+      </div>
+
+      <nav aria-label="paginate" class="mt-3">
+        <ul class="pagination">
+          <li class="page-item {% if page_num <= 1 %}disabled{% endif %}"><a class="page-link" href="/tickets/{{ view_by }}/{{ page_num - 1 }}" tabindex="-1">Previous</a></li>
+
+          {% for i in 1..max_pages %}
+          <li class="page-item {% if page_num == i %}active{% endif %}"><a class="page-link" href="/tickets/{{ view_by }}/{{ i }}">{{ i }}</a></li>
+          {% endfor %}
+          <li class="page-item {% if page_num == max_pages %}disabled{% endif %}"><a class="page-link" href="/tickets/{{ view_by }}/{{ page_num + 1 }}">Next</a></li>
+        </ul>
+      </nav>
+    </div>
+    
+  </div>
+</main>
+
+{% if tickets is not null %}
+<script>
+      var tickets = {{ tickets|json_encode|raw }};
+</script>
+{% endif %}

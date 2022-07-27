@@ -1,0 +1,41 @@
+  <main role="main" class="container flex-fill" id="login">
+    <div class="container-fluid">
+      <div class="row login-block">
+        <div class="col-12">
+        
+          <div class="logo"><img src="{{ site_url }}/assets/images/logo.png"></div>
+          <p style="margin: 0 auto 40px auto; max-width: 480px; display: block" class="text-center">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros.</p>
+          {% if failed_login == 'true' %}
+          <div class="alert alert-danger" role="alert">Invalid login! Please try again...</div>
+          {% endif %}
+          {% if error == 'true' %}
+          <p class="text-danger">Error: {{ error_message }}</p>
+          {% endif %}
+          
+          <hr style="margin-bottom: 40px">
+
+          <div class="login-form">
+            <form action="/login" method="post" id="login-form">
+              <div class="form-group mb-3">
+                <input type="text" class="form-control" placeholder="Email*" value="" name="email" id="loginEmail" required />
+              </div>
+              <div class="form-group">
+                <input type="password" class="form-control" placeholder="Password*" value="" name="password" loginPassword required />
+              </div>
+              <div class="form-group">
+                <input type="submit" class="btn btn-primary w-100" value="Login" />
+              </div>
+            </form>
+            <hr>
+            <div class="form-group">
+              <a href="/register" class="btn btn-register btn-primary w-100"><i class="fas fa-user-plus"></i> Create an account</a>
+            </div>
+            <div class="form-group">
+              <a href="/reset-password" class="btn btn-register btn-secondary w-100"><i class="fa fa-refresh" aria-hidden="true"></i> Reset My Password</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>

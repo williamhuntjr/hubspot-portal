@@ -1,0 +1,4 @@
+config/api.php
+config/database.php
+config/email.php
+assets/files/*

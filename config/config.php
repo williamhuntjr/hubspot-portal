@@ -1,0 +1,15 @@
+<?php
+
+include(dirname(__FILE__)."/api.php");
+
+// Some basic configuration settings for XTC
+define( 'SITE_DOMAIN', 'portal.hubspot.local' );
+define( 'SITE_FOLDER', '');
+define( 'USE_SSL', false);
+
+define( 'TICKETS_PER_PAGE', '10');
+
+// A random key to encrypt email configuration
+define( 'EMAIL_KEY', '58b73e29be4b67aff74636e50ef85751e70421afaec54126ed9749fa276e8331');
+
+?>
